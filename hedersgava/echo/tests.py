@@ -17,7 +17,7 @@ class TestEcho:
     def test_echo_json_status_result(self, json_data, rf):
         """Testing echo api response status result is function correctly with json data
         """
-        data = {'null':json.dumps(json_data)}
+        data = {'null': json.dumps(json_data)}
         request = rf.post('/echo/', data, content_type='application/json')
         response = echo(request)
         assert response.status_code == 200
