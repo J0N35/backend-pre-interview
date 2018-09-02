@@ -12,6 +12,9 @@ mypy = "*"
 pylint = "*"
 pytest-django = "*"
 pylint-django = "*"
+"json2xml" = "*"
+dicttoxml = "*"
+djangorestframework-xml = "*"
 
 [dev-packages]
 

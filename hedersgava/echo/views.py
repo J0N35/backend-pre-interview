@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
-from rest_framework.response import Response as response
-# Create your views here.
+from rest_framework.response import Response
+
 
 @api_view(['POST'])
 def echo(request):
@@ -11,5 +11,5 @@ def echo(request):
     if request.method == 'POST':
         data = request.data
         if data:
-            return response(data, status=200, content_type=request.content_type)
-        return response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(data, status=200, content_type=request.content_type)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

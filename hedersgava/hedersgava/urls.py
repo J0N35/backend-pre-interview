@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.conf.urls import url, include
 
 urlpatterns = [  # pylint: disable=invalid-name
-    url(r'^echo/$', include('echo.urls')),  # echo
+    # url(r'^echo/', include('echo.urls')),  # echo
     url('admin/', admin.site.urls),
     url(r'data/', include('data.urls')),  # data
 ]

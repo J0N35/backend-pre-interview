@@ -9,8 +9,11 @@ from django.test import Client
 
 from .views import echo
 
-json_data = st.recursive(st.booleans() | st.floats() | st.text(printable),
-                        lambda children: st.dictionaries(st.text(printable), children))
+json_data = st.recursive(
+    st.booleans() | st.floats() | st.text(printable),
+    lambda children: st.dictionaries(st.text(printable), children)
+)
+
 
 class TestEcho:
     @given(json_data=json_data)
