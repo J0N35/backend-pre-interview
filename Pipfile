@@ -15,6 +15,7 @@ pylint-django = "*"
 "json2xml" = "*"
 dicttoxml = "*"
 djangorestframework-xml = "*"
+django-bulk-update = "*"
 
 [dev-packages]
 

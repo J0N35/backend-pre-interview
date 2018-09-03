@@ -1,4 +1,5 @@
 from django.db import models
+from django_bulk_update.manager import BulkUpdateManager
 
 
 class Device(models.Model):
@@ -13,12 +14,12 @@ class Device(models.Model):
     device_type = models.CharField(max_length=50)
 
     @property
-    def device_unit(self):
+    def unit(self):
         return self.unit_set[self.device_type.__str__()]
 
 
 class ValueLog(models.Model):
     device_id = models.ForeignKey(Device, on_delete=models.CASCADE)
-    log_datetime = models.DateTimeField()
+    datetime = models.DateTimeField()
     log_id = models.IntegerField()
-    device_value = models.FloatField()
+    value = models.FloatField()

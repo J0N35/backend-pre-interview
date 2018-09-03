@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "52b0bc24dd42fb3a436ba908e1c1076cbecc980312b0a1e5bfad79a9eb939d7c"
+            "sha256": "1171caefc59f0e76b6967392d89b071efa977eda6805bf9b16beb0fe66c66849"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -125,6 +125,14 @@
             "index": "pypi",
             "version": "==2.1.1"
         },
+        "django-bulk-update": {
+            "hashes": [
+                "sha256:49a403392ae05ea872494d74fb3dfa3515f8df5c07cc277c3dc94724c0ee6985",
+                "sha256:5ab7ce8a65eac26d19143cc189c0f041d5c03b9d1b290ca240dc4f3d6aaeb337"
+            ],
+            "index": "pypi",
+            "version": "==2.2.0"
+        },
         "djangorestframework": {
             "hashes": [
                 "sha256:b6714c3e4b0f8d524f193c91ecf5f5450092c2145439ac2769711f7eba89a9d9",
@@ -143,12 +151,12 @@
         },
         "hypothesis": {
             "hashes": [
-                "sha256:090ec0c51c09635ee71e7dbf71b005296870ab0e091165be0f2b79233c224972",
-                "sha256:56fec71bb58e2cde86685b777c9ab7c5b7f2a05931c2fdda72eee8093f4ca692",
-                "sha256:963931222efd05ec776d75301a1082401b8c21ff598ab89e8fcd590a53d3790d"
+                "sha256:2b35192cd3562e478715fc604ba139587cf220c1337b94b27abcbaab64d050e7",
+                "sha256:6cfba53326f96b33af9836792eafcf706c86a255bcd47e7c551663fa63ac9b4c",
+                "sha256:cfd671c05dc650e5dce7f9827671e1427e0ec79efa2a132deb5eab99b8310349"
             ],
             "index": "pypi",
-            "version": "==3.70.0"
+            "version": "==3.70.3"
         },
         "idna": {
             "hashes": [
