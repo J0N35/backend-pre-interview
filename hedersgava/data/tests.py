@@ -1,7 +1,7 @@
 from rest_framework.test import APITestCase
 import pytest
 from rest_framework import status
-import pytz
+from pytz import timezone
 import json
 from .models import RecordLog
 from datetime import datetime
@@ -51,7 +51,7 @@ xml_data = """<?xml version="1.0" encoding="UTF-8"?>
 
 
 @pytest.mark.django_db
-class TestGetMethod(APITestCase):
+class TestAPI(APITestCase):
     def setUp(self):
         RecordLog.objects.create(
             device_id="G3112",
@@ -82,10 +82,10 @@ class TestGetMethod(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(RecordLog.objects.count(), 9)
 
-    def test_02_get_log_by_request(self):
+    def test_02_get_log(self):
         response = self.client.get('/data/1008910273/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        _test_time = datetime.fromtimestamp(1008910273)
+        _test_time = datetime.fromtimestamp(1008910273, tz=timezone('Asia/Hong_Kong'))
         _test_time = _test_time.isoformat()
         expected = json.dumps([
             {"datetime": _test_time,
@@ -95,5 +95,12 @@ class TestGetMethod(APITestCase):
              "value": 25.253,
              "unit": "A"},
         ])
+        actual = json.dumps(json.loads(response.content.decode('utf-8')))
+        self.assertEqual(actual, expected)
+
+    def test_03_get_log_no_result(self):
+        response = self.client.get('/data/1008910555/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected = json.dumps([])
         actual = json.dumps(json.loads(response.content.decode('utf-8')))
         self.assertEqual(actual, expected)
