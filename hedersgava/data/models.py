@@ -1,5 +1,4 @@
 from django.db import models
-from django_bulk_update.manager import BulkUpdateManager
 
 
 class Device(models.Model):

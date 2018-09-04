@@ -21,4 +21,3 @@ urlpatterns = [  # pylint: disable=invalid-name
     url('admin/', admin.site.urls),
     url(r'data/', include('data.urls')),  # data
 ]
-

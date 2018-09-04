@@ -1,14 +1,9 @@
-from django.test import TestCase
-import pytest
 from rest_framework.test import APITestCase
+import pytest
 from rest_framework import status
-from hypothesis import strategies as st
-from string import printable
-from hypothesis import given
-from dicttoxml import dicttoxml
+import pytz
 import json
-# from .views import input_data
-from .models import Device, ValueLog, RecordLog
+from .models import RecordLog
 from datetime import datetime
 
 xml_data = """<?xml version="1.0" encoding="UTF-8"?>
@@ -62,52 +57,43 @@ class TestGetMethod(APITestCase):
             device_id="G3112",
             device_type="Temperature Sensor",
             value=14.0524,
-            datetime=datetime.fromtimestamp(1008910273).isoformat(),
+            datetime=datetime.fromtimestamp(1008910273),
             log_id=2314
         )
         RecordLog.objects.create(
             device_id="SGB-11232",
             device_type="Current Meter",
             value=25.253,
-            datetime=datetime.fromtimestamp(1008910273).isoformat(),
+            datetime=datetime.fromtimestamp(1008910273),
             log_id=2314
         )
         RecordLog.objects.create(
             device_id="SGB-11232",
             device_type="Current Meter",
             value=30.123,
-            datetime=datetime.fromtimestamp(1008912222).isoformat(),
+            datetime=datetime.fromtimestamp(1008912222),
             log_id=2320
         )
-        # Device.objects.create(device_id="G3112", )
-        # Device.objects.create(device_id="SGB-11233", device_type="Current Meter")
-        # ValueLog.objects.create(
-        #     device_id_id="SGB-11233",
-        #     value=25.253,
-        #     datetime=datetime.fromtimestamp(1008910273).isoformat(),
-        #     log_id=2314
-        # )
-        # ValueLog.objects.create(
-        #     device_id_id="G3112",
-        #     value=14.0524,
-        #     datetime=datetime.fromtimestamp(1008911111).isoformat(),
-        #     log_id=2318
-        # )
 
     def test_01_post_success(self):
-        response = self.client.post('/data/', xml_data, content_type='application/xml')
+        response = self.client.post('/data/',
+                                    xml_data,
+                                    content_type='application/xml')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(RecordLog.objects.count(), 8)
+        self.assertEqual(RecordLog.objects.count(), 9)
 
     def test_02_get_log_by_request(self):
         response = self.client.get('/data/1008910273/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        _test_time = datetime.fromtimestamp(1008910273)
+        _test_time = _test_time.isoformat()
         expected = json.dumps([
-            {"datetime": datetime.fromtimestamp(1008910273).isoformat(),
+            {"datetime": _test_time,
              "value": 14.0524,
              "unit": "°C"},
-            {"datetime": datetime.fromtimestamp(1008910273).isoformat(),
+            {"datetime": _test_time,
              "value": 25.253,
              "unit": "A"},
         ])
-        self.assertEqual(response.content, expected)
+        actual = json.dumps(json.loads(response.content.decode('utf-8')))
+        self.assertEqual(actual, expected)

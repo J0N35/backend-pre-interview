@@ -13,7 +13,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import url
 from . import views
 from rest_framework import routers
 
@@ -21,8 +20,3 @@ router = routers.SimpleRouter()
 router.register(r'', views.DataViewSet)
 
 urlpatterns = router.urls
-
-# urlpatterns = [
-#     url(r'^$', views.input_data, name='insert_data'),
-#     url(r'(?P<timestamp>\d+)/$', views.ListData.as_view(), name='view_data'),
-# ]
