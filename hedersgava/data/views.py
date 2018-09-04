@@ -1,12 +1,13 @@
 from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from django.http import JsonResponse
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status, viewsets
 from rest_framework_xml.parsers import XMLParser
 from rest_framework import generics
-# from .serializers import DeviceSerializers, LogSerializers, GetLogSerializers
-from .serializers import DeviceSerializers
-from .models import Device, ValueLog
+from .serializers import ListLogSerializers
+from .models import Device, ValueLog, RecordLog
 from .serializers import LogSerializers
 from datetime import datetime
 
@@ -105,56 +106,98 @@ class CustomizedXMLParser(XMLParser):
 
 
 class DataViewSet(viewsets.ModelViewSet):
-    queryset = ValueLog.objects.all()
+    queryset = RecordLog.objects.all()
     serializer_class = LogSerializers
     parser_classes = (CustomizedXMLParser,)
+    # renderer_classes = (JSONRenderer,)
 
     def create(self, request, *args, **kwargs):
         record_id = request.data.get('id', None)
         record_datetime = request.data.get('record_time', None)
         record_value = request.data.get('data', None)
         devices = request.data.get('devices', None)
-        is_device_added = False
-        is_log_added = False
-        # -device list handle-
-        device_list = list()
-        for key, value in devices.items():
-            device_list.append(
-                {'device_id': key, 'device_type': value}
-            )
-        _devices = DeviceSerializers(data=device_list, many=True)
-        if _devices.is_valid():
-            _devices.create(_devices.validated_data)
-            is_device_added = True
-        # -log handle-
         for entry in record_value:
             entry['device_id'] = entry['device']
+            entry['device_type'] = devices.get(entry['device'], None)
             entry['log_id'] = record_id
             entry['datetime'] = datetime.fromtimestamp(record_datetime)
+
         _records = LogSerializers(data=record_value, many=True)
         if _records.is_valid():
             _records.create(_records.validated_data)
-            is_log_added = True
-        # -response-
-        if is_device_added and is_log_added:
+
             return Response(
-                status=status.HTTP_200_OK
+                data=_records.validated_data,
+                status=status.HTTP_201_CREATED
             )
         else:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+    def retrieve(self, request, *args, **kwargs):
+        timestamp = kwargs.get('pk')
+        try:
+            timestamp = datetime.fromtimestamp(int(timestamp))
+        except Exception as exec:
+            print(exec)
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        instance = self.queryset.filter(datetime=timestamp)
+        deserializer = ListLogSerializers(instance, many=True)
+        return Response(deserializer.data)
 
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+
+
+    #     is_device_added = False
+    #     is_log_added = False
+    #     # -device list handle-
+    #     device_list = list()
+    #     for key, value in devices.items():
+    #         device_list.append(
+    #             {'device_id': key, 'device_type': value}
+    #         )
+    #     _devices = DeviceSerializers(data=device_list, many=True)
+    #     if _devices.is_valid():
+    #         _devices.create(_devices.validated_data)
+    #         is_device_added = True
+    #     # -log handle-
+    #     for entry in record_value:
+    #         entry['device_id'] = entry['device']
+    #         entry['log_id'] = record_id
+    #         entry['datetime'] = datetime.fromtimestamp(record_datetime)
+    #     _records = LogSerializers(data=record_value, many=True)
+    #     if _records.is_valid():
+    #         _records.create(_records.validated_data)
+    #         is_log_added = True
+    #     # -response-
+    #     if is_device_added and is_log_added:
+    #         return Response(
+    #             status=status.HTTP_200_OK
+    #         )
+    #     else:
+    #         return Response(
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
+    #
+    # def list(self, request, *args, **kwargs):
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #
+    #     page = self.paginate_queryset(queryset)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
+    #
+    #     serializer = self.get_serializer(queryset, many=True)
+    #     return Response(serializer.data)
+    #
+    # def retrieve(self, request, *args, **kwargs):
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #     timestamp = self.kwargs['pk']
+    #     timestamp = datetime.fromtimestamp(int(timestamp)).isoformat()
+    #     page = self.paginate_queryset(queryset)
 
 
 

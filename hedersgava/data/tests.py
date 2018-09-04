@@ -8,7 +8,7 @@ from hypothesis import given
 from dicttoxml import dicttoxml
 import json
 # from .views import input_data
-from .models import Device, ValueLog
+from .models import Device, ValueLog, RecordLog
 from datetime import datetime
 
 xml_data = """<?xml version="1.0" encoding="UTF-8"?>
@@ -58,28 +58,48 @@ xml_data = """<?xml version="1.0" encoding="UTF-8"?>
 @pytest.mark.django_db
 class TestGetMethod(APITestCase):
     def setUp(self):
-        Device.objects.create(device_id="G3112", device_type="Temperature Sensor")
-        Device.objects.create(device_id="SGB-11233", device_type="Current Meter")
-        ValueLog.objects.create(
-            device_id_id="G3112",
+        RecordLog.objects.create(
+            device_id="G3112",
+            device_type="Temperature Sensor",
             value=14.0524,
             datetime=datetime.fromtimestamp(1008910273).isoformat(),
             log_id=2314
         )
-        ValueLog.objects.create(
-            device_id_id="SGB-11233",
+        RecordLog.objects.create(
+            device_id="SGB-11232",
+            device_type="Current Meter",
             value=25.253,
             datetime=datetime.fromtimestamp(1008910273).isoformat(),
             log_id=2314
         )
-        ValueLog.objects.create(
-            device_id_id="G3112",
-            value=14.0524,
-            datetime=datetime.fromtimestamp(1008911111).isoformat(),
-            log_id=2318
+        RecordLog.objects.create(
+            device_id="SGB-11232",
+            device_type="Current Meter",
+            value=30.123,
+            datetime=datetime.fromtimestamp(1008912222).isoformat(),
+            log_id=2320
         )
+        # Device.objects.create(device_id="G3112", )
+        # Device.objects.create(device_id="SGB-11233", device_type="Current Meter")
+        # ValueLog.objects.create(
+        #     device_id_id="SGB-11233",
+        #     value=25.253,
+        #     datetime=datetime.fromtimestamp(1008910273).isoformat(),
+        #     log_id=2314
+        # )
+        # ValueLog.objects.create(
+        #     device_id_id="G3112",
+        #     value=14.0524,
+        #     datetime=datetime.fromtimestamp(1008911111).isoformat(),
+        #     log_id=2318
+        # )
 
-    def test_get_log_by_request(self):
+    def test_01_post_success(self):
+        response = self.client.post('/data/', xml_data, content_type='application/xml')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(RecordLog.objects.count(), 8)
+
+    def test_02_get_log_by_request(self):
         response = self.client.get('/data/1008910273/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected = json.dumps([
@@ -91,13 +111,3 @@ class TestGetMethod(APITestCase):
              "unit": "A"},
         ])
         self.assertEqual(response.content, expected)
-
-
-
-@pytest.mark.django_db
-class TestPostMethod(APITestCase):
-    def test_post_200(self):
-        response = self.client.post('/data/', xml_data, content_type='application/xml')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(Device.objects.count(), 5)
-        self.assertEqual(ValueLog.objects.count(), 6)

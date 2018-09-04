@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Device, ValueLog
+from .models import Device, ValueLog, RecordLog
 from django_bulk_update.helper import bulk_update
 
 
@@ -17,18 +17,29 @@ class DeviceSerializers(serializers.ModelSerializer):
             'device_id', 'device_type', 'unit'
         )
 
+    def validate_device_id(self, value):
+        pass
+        return value
+
 
 class LogListS(serializers.ListSerializer):
     def create(self, validated_data):
         for entry in validated_data:
-            ValueLog.objects.update_or_create(**entry)
+            RecordLog.objects.update_or_create(**entry)
 
 
 class LogSerializers(serializers.ModelSerializer):
+
     class Meta:
-        model = ValueLog
+        model = RecordLog
         list_serializer_class = LogListS
-        fields = ('datetime', 'value', 'log_id', 'device_id')
+        fields = ('datetime', 'value', 'log_id', 'device_id', 'device_type')
+
+
+class ListLogSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = RecordLog
+        fields = ('datetime', 'value', 'unit')
 
 # class LogSerializers(serializers.Serializer):
 #     device_id = serializers.CharField(max_length=10)
